@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.15)
+project(2DWORLD)
+set(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /subsystem:windows")
+include_directories("e:\\usr\\include")
+link_directories( "e:\\usr\\lib")
+add_executable(master master.cpp BaseWorld.cpp TheWorld.cpp image.cpp)
+target_link_libraries(master d2d1.lib windowsCodecs.lib)
