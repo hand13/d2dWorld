@@ -17,5 +17,5 @@ class BaseWorld {
     virtual void onResize();
     virtual void render() = 0;
     RECT size();
-    bool resize();
+    virtual bool resize();
 };

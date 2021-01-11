@@ -3,10 +3,20 @@
 TheWorld::TheWorld(HWND hWnd):BaseWorld(hWnd) {
 }
 bool TheWorld::initResource() {
+    if((FAILED(decodeImage(L"e:\\white_clear.png",bitmapSource.GetAddressOf())))) {
+        return false;
+    }
     if(!BaseWorld::initResource()) {
         return false;
     }
-    if((FAILED(decodeImage(L"e:\\test.jpg",bitmapSource.GetAddressOf())))) {
+    return true;
+}
+bool TheWorld::resize() {
+    if(!BaseWorld::resize()) {
+        return false;
+    }
+    HRESULT hr = renderTarget->CreateBitmapFromWicBitmap(bitmapSource.Get(),bitmap.ReleaseAndGetAddressOf());
+    if(FAILED(hr)) {
         return false;
     }
     return true;
@@ -18,12 +28,11 @@ void TheWorld::render() {
     renderTarget->FillRectangle(rect,mainBrush.Get());
     WICPixelFormatGUID format;
     bitmapSource->GetPixelFormat(&format);
-    HRESULT hr = renderTarget->CreateBitmapFromWicBitmap(bitmapSource.Get(),bitmap.ReleaseAndGetAddressOf());
-    if(SUCCEEDED(hr)) {
-        renderTarget->DrawBitmap(bitmap.Get()
-        ,D2D1::RectF(0,0,300,300)
-        ,1.0,D2D1_BITMAP_INTERPOLATION_MODE_LINEAR
-        ,D2D1::RectF(0,0,300,300));
-    }
+    auto width = bitmap->GetSize().width;
+    auto height = bitmap->GetSize().height;
+    renderTarget->DrawBitmap(bitmap.Get()
+    ,D2D1::RectF(0,0,width,height)
+    ,1.0,D2D1_BITMAP_INTERPOLATION_MODE_LINEAR
+    ,D2D1::RectF(0,0,width,height));
     renderTarget->EndDraw();
 }
