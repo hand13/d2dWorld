@@ -6,6 +6,7 @@ class TheWorld:public BaseWorld {
     ComPtr<ID2D1Bitmap> bitmap;
     ComPtr<IDWriteTextFormat> textFormat;
     ComPtr<IDWriteFactory> writeFactory;
+    HRESULT getTextSize(const WCHAR * text,IDWriteTextFormat * pTextFormat,D2D1_SIZE_F & size);
     protected:
     public:
     TheWorld(HWND hWnd);
