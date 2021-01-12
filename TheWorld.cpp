@@ -38,15 +38,15 @@ void TheWorld::render() {
     bitmapSource->GetPixelFormat(&format);
     auto width = bitmap->GetSize().width;
     auto height = bitmap->GetSize().height;
+    RECT size = this->size();
     renderTarget->DrawBitmap(bitmap.Get()
-    ,D2D1::RectF(0,0,width,height)
+    ,D2D1::RectF(size.left,size.top,size.right,size.bottom)
     ,1.0,D2D1_BITMAP_INTERPOLATION_MODE_LINEAR
     ,D2D1::RectF(0,0,width,height));
     // Create text layout rect
     auto text = L"link start";
     D2D1_SIZE_F textSize = {0.0,0.0};
     getTextSize(text,textFormat.Get(),textSize);
-    RECT size = this->size();
     int x = (size.left + size.right)/2 - textSize.width/2;
     int y = size.top + 10.0;
     D2D1_RECT_F layoutRect = D2D1::RectF(
