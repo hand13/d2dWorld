@@ -5,6 +5,7 @@ class TheWorld:public BaseWorld {
     ComPtr<IWICBitmapSource> bitmapSource;
     ComPtr<ID2D1Bitmap> bitmap;
     ComPtr<IDWriteTextFormat> textFormat;
+    ComPtr<IDWriteFactory> writeFactory;
     protected:
     public:
     TheWorld(HWND hWnd);
