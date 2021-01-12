@@ -3,6 +3,7 @@
 TheWorld::TheWorld(HWND hWnd):BaseWorld(hWnd) {
 }
 bool TheWorld::initResource() {
+    worldMap = std::make_unique<Map>(20,20,D2D1::RectF(50.f,100.f,550.f,550.f));
     if((FAILED(decodeImage(L"e:\\white_clear.png",bitmapSource.GetAddressOf())))) {
         return false;
     }
@@ -55,6 +56,7 @@ void TheWorld::render() {
         static_cast<float>(y + textSize.height)
     );
     renderTarget->DrawText(text,lstrlenW(text),textFormat.Get(),layoutRect,mainBrush.Get());
+    worldMap->draw(renderTarget.Get(),mainBrush.Get());
     renderTarget->EndDraw();
 }
 HRESULT TheWorld::getTextSize(const WCHAR * text,IDWriteTextFormat * pTextFormat,D2D1_SIZE_F & size) {
@@ -70,4 +72,10 @@ HRESULT TheWorld::getTextSize(const WCHAR * text,IDWriteTextFormat * pTextFormat
         pLayout->Release();
     }
     return hr;
+}
+bool TheWorld::touched(D2D1_POINT_2F & point) {
+    if (worldMap->touched(point)) {
+        render();
+    }
+    return true;
 }

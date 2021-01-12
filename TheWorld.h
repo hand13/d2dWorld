@@ -1,7 +1,10 @@
 #pragma once
 #include "BaseWorld.h"
+#include <memory>
+#include "Map.h"
 class TheWorld:public BaseWorld {
     private:
+    std::unique_ptr<Map> worldMap;
     ComPtr<IWICBitmapSource> bitmapSource;
     ComPtr<ID2D1Bitmap> bitmap;
     ComPtr<IDWriteTextFormat> textFormat;
@@ -13,4 +16,5 @@ class TheWorld:public BaseWorld {
     virtual bool initResource();
     virtual void render();
     virtual bool resize();
+    bool touched(D2D1_POINT_2F & point);
 };
