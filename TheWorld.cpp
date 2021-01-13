@@ -1,5 +1,6 @@
 ﻿#include "TheWorld.h"
 #include "image.h"
+#include "tool.h"
 TheWorld::TheWorld(HWND hWnd):BaseWorld(hWnd) {
 }
 bool TheWorld::initResource() {
@@ -15,7 +16,7 @@ bool TheWorld::initResource() {
     }
     if(FAILED(writeFactory->CreateTextFormat(L"Arial",NULL
     ,DWRITE_FONT_WEIGHT_REGULAR,DWRITE_FONT_STYLE_NORMAL,DWRITE_FONT_STRETCH_NORMAL
-    ,60.f,L"en-us",textFormat.GetAddressOf()
+    ,20.f,L"en-us",textFormat.GetAddressOf()
     ))) {
         return false;
     }
@@ -44,6 +45,7 @@ void TheWorld::render() {
     ,1.0,D2D1_BITMAP_INTERPOLATION_MODE_LINEAR
     ,D2D1::RectF(0,0,width,height));
     // Create text layout rect
+
     auto text = L"link start";
     D2D1_SIZE_F textSize = {0.0,0.0};
     getTextSize(text,textFormat.Get(),textSize);
@@ -56,6 +58,11 @@ void TheWorld::render() {
         static_cast<float>(y + textSize.height)
     );
     renderTarget->DrawText(text,lstrlenW(text),textFormat.Get(),layoutRect,mainBrush.Get());
+
+    std::wstring nowTime = nowStr();
+    renderTarget->DrawText(nowTime.c_str(),lstrlenW(nowTime.c_str()),
+    textFormat.Get(),D2D1::RectF(0.f,0.f,200.f,30.f),mainBrush.Get());
+
     worldMap->draw(renderTarget.Get(),mainBrush.Get());
     renderTarget->EndDraw();
 }
