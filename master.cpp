@@ -1,8 +1,10 @@
 ﻿#include <windows.h>
 #include "TheWorld.h"
+#include "tool.h"
 TheWorld * theWorld;
 LRESULT CALLBACK WndProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam);
 int WINAPI WinMain(HINSTANCE hi,HINSTANCE p,LPSTR command,int tmp) {
+    Time time;
     CoInitialize(NULL);
     WNDCLASSEX wndClass = {sizeof(WNDCLASSEX),CS_CLASSDC,WndProc,0L,0L,hi,NULL,NULL,NULL,NULL,TEXT("live2dworld"),NULL};
     RegisterClassEx(&wndClass);
@@ -17,12 +19,19 @@ int WINAPI WinMain(HINSTANCE hi,HINSTANCE p,LPSTR command,int tmp) {
     MSG msg;
     ZeroMemory(&msg,sizeof(msg));
     HRESULT hr;
-    while((hr = GetMessage(&msg,hWnd,0,0)) != 0) {
-        if(hr == -1) {
-            break;
-        }
+    time.init();
+    long expectedDelta = 1000/60;
+    while(msg.message != WM_QUIT) {
+        if(PeekMessage(&msg,NULL,0,0,PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
+        continue;
+        }
+        auto delta = expectedDelta - time.getDelta();
+        if(delta > 0) {
+            Sleep(delta);
+        }
+        theWorld->render();
     }
   return 0;
 }
