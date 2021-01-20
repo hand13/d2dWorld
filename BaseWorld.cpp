@@ -62,7 +62,6 @@ Event BaseWorld::fromWindowsEvent(UINT msg,WPARAM wParam,LPARAM lParam){
         event.eventType = WE_MOUSE_RELEASED;
         event.x = LOWORD(lParam);
         event.y = HIWORD(lParam);
-        // theWorld->touched(D2D1::Point2F(static_cast<float>(x),static_cast<float>(y)));
         break;
     default:
         break;
@@ -74,4 +73,12 @@ void BaseWorld::processEvent(Event event) {
     if(event.eventType == WE_NONE) {
         return;
     }
+    auto & v = eventProcessors[event.eventType];
+    for(EventProcesser & processor:v) {
+        processor(this,event);
+    }
+}
+void BaseWorld::addEventProcessor(WorldEventType type,EventProcesser eventProcessor) {
+    auto & v = eventProcessors[type];
+    v.push_back(eventProcessor);
 }

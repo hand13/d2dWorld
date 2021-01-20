@@ -21,6 +21,10 @@ struct Event {
     int y;
     int key;
 };
+class BaseWorld;
+
+typedef bool (*EventProcesser) (BaseWorld * data,const Event& e);
+
 class BaseWorld {
     protected:
     ComPtr<ID2D1Factory> d2dFactory;
@@ -35,7 +39,9 @@ class BaseWorld {
     virtual void render() = 0;
     RECT size();
     void processEvent(UINT msg,WPARAM wParam,LPARAM lParam);
+    void addEventProcessor(WorldEventType type,EventProcesser eventProcessor);
     private:
+    std::map<WorldEventType,std::vector<EventProcesser>> eventProcessors;
     Event fromWindowsEvent(UINT msg,WPARAM wParam,LPARAM lParam);
     virtual void onResize();
 };

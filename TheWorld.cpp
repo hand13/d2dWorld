@@ -20,6 +20,7 @@ bool TheWorld::initResource() {
     ))) {
         return false;
     }
+    addEventProcessor(WE_MOUSE_CLICKED,clickProcessor);
     return true;
 }
 bool TheWorld::resize() {
@@ -82,7 +83,19 @@ HRESULT TheWorld::getTextSize(const WCHAR * text,IDWriteTextFormat * pTextFormat
 }
 bool TheWorld::touched(D2D1_POINT_2F & point) {
     if (worldMap->touched(point)) {
-        render();
+        // render();
     }
     return true;
+}
+
+bool TheWorld::click(const Event & event) {
+    return touched(D2D1::Point2F(static_cast<float>(event.x),static_cast<float>(event.y)));
+}
+
+bool TheWorld::clickProcessor(BaseWorld * data,const Event & event) {
+    TheWorld * theWorld = dynamic_cast<TheWorld*>(data);
+    if(theWorld != nullptr) {
+        return theWorld->click(event);
+    }
+    return false;
 }
