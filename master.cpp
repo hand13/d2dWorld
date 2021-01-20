@@ -36,28 +36,8 @@ int WINAPI WinMain(HINSTANCE hi,HINSTANCE p,LPSTR command,int tmp) {
   return 0;
 }
 LRESULT CALLBACK WndProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam) {
-    static int x = 0;
-    static int y = 0;
-    switch (msg)
-    {
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
-    case WM_SIZE:
-        theWorld->onResize();
-        break;
-    case WM_PAINT:
-        theWorld->render();
-        break;
-    case WM_LBUTTONDOWN:
-        x = LOWORD(lParam);
-        y = HIWORD(lParam);
-        break;
-    case WM_LBUTTONUP:
-        theWorld->touched(D2D1::Point2F(static_cast<float>(x),static_cast<float>(y)));
-        break;
-    default:
-        break;
+    if (theWorld != nullptr) {
+        theWorld->processEvent(msg, wParam, lParam);
     }
     return DefWindowProc(hWnd,msg,wParam,lParam);
 }

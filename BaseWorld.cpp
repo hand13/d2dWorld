@@ -34,3 +34,44 @@ RECT BaseWorld::size() {
     GetClientRect(hWnd,&tmp);
     return tmp;
 }
+void BaseWorld::processEvent(UINT msg,WPARAM wParam,LPARAM lParam) {
+    switch (msg) {
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return;
+    case WM_SIZE:
+        onResize();
+        return;
+    default:
+        break;
+    }
+    Event event = fromWindowsEvent(msg,wParam,lParam);
+    processEvent(event);
+}
+Event BaseWorld::fromWindowsEvent(UINT msg,WPARAM wParam,LPARAM lParam){
+    Event event;
+    ZeroMemory(&event,sizeof(event));
+    event.eventType = WE_NONE;
+    switch(msg) {
+    case WM_LBUTTONDOWN:
+        event.eventType = WE_MOUSE_CLICKED;
+        event.x = LOWORD(lParam);
+        event.y = HIWORD(lParam);
+        break;
+    case WM_LBUTTONUP:
+        event.eventType = WE_MOUSE_RELEASED;
+        event.x = LOWORD(lParam);
+        event.y = HIWORD(lParam);
+        // theWorld->touched(D2D1::Point2F(static_cast<float>(x),static_cast<float>(y)));
+        break;
+    default:
+        break;
+    }
+    return event;
+}
+
+void BaseWorld::processEvent(Event event) {
+    if(event.eventType == WE_NONE) {
+        return;
+    }
+}
