@@ -5,6 +5,7 @@
 class TheWorld:public BaseWorld {
     private:
     std::unique_ptr<Map> worldMap;
+    std::unique_ptr<SpiderWeb> spiderWeb;
     ComPtr<IWICBitmapSource> bitmapSource;
     ComPtr<ID2D1Bitmap> bitmap;
     ComPtr<IDWriteTextFormat> textFormat;
@@ -19,4 +20,6 @@ class TheWorld:public BaseWorld {
     bool touched(D2D1_POINT_2F & point);
     bool click(const Event& event);
     static bool clickProcessor(BaseWorld * data,const Event & event);
+    void tick(float delta);
+    void move(const D2D1_POINT_2F & point);
 };

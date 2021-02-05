@@ -5,6 +5,7 @@ TheWorld::TheWorld(HWND hWnd):BaseWorld(hWnd) {
 }
 bool TheWorld::initResource() {
     worldMap = std::make_unique<Map>(20,20,D2D1::RectF(50.f,100.f,550.f,550.f));
+    spiderWeb = std::make_unique<SpiderWeb>(D2D1::RectF(0.f,0.f,300.f,300.f));
     if((FAILED(decodeImage(L"e:\\white_clear.png",bitmapSource.GetAddressOf())))) {
         return false;
     }
@@ -64,7 +65,9 @@ void TheWorld::render() {
     renderTarget->DrawText(nowTime.c_str(),lstrlenW(nowTime.c_str()),
     textFormat.Get(),D2D1::RectF(0.f,0.f,200.f,30.f),mainBrush.Get());
 
-    worldMap->draw(renderTarget.Get(),mainBrush.Get());
+    spiderWeb->draw(renderTarget.Get(),mainBrush.Get());
+
+    // worldMap->draw(renderTarget.Get(),mainBrush.Get());
     renderTarget->EndDraw();
 }
 HRESULT TheWorld::getTextSize(const WCHAR * text,IDWriteTextFormat * pTextFormat,D2D1_SIZE_F & size) {
@@ -90,6 +93,14 @@ bool TheWorld::touched(D2D1_POINT_2F & point) {
 
 bool TheWorld::click(const Event & event) {
     return touched(D2D1::Point2F(static_cast<float>(event.x),static_cast<float>(event.y)));
+}
+
+void TheWorld::tick(float delta) {
+    spiderWeb->onTick(delta);
+}
+
+void TheWorld::move(const D2D1_POINT_2F&point) {
+    spiderWeb->onMove(point);
 }
 
 bool TheWorld::clickProcessor(BaseWorld * data,const Event & event) {

@@ -31,7 +31,10 @@ int WINAPI WinMain(HINSTANCE hi,HINSTANCE p,LPSTR command,int tmp) {
         if(delta > 0) {
             Sleep(delta);
         }
-        theWorld->render();
+        if (theWorld != nullptr) {
+            theWorld->tick(1.0 / 60.0);
+            theWorld->render();
+        }
     }
   return 0;
 }
