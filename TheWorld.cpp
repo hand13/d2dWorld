@@ -5,7 +5,9 @@ TheWorld::TheWorld(HWND hWnd):BaseWorld(hWnd) {
 }
 bool TheWorld::initResource() {
     worldMap = std::make_unique<Map>(20,20,D2D1::RectF(50.f,100.f,550.f,550.f));
-    spiderWeb = std::make_unique<SpiderWeb>(D2D1::RectF(0.f,0.f,300.f,300.f));
+    RECT rectSize = size();
+    spiderWeb = std::make_unique<SpiderWeb>(D2D1::RectF(0.f,0.f
+    ,rectSize.right - rectSize.left,rectSize.bottom - rectSize.top));
     if((FAILED(decodeImage(L"e:\\white_clear.png",bitmapSource.GetAddressOf())))) {
         return false;
     }
@@ -22,6 +24,7 @@ bool TheWorld::initResource() {
         return false;
     }
     addEventProcessor(WE_MOUSE_CLICKED,clickProcessor);
+    addEventProcessor(WE_MOUSE_MOVED,moveProcessor);
     return true;
 }
 bool TheWorld::resize() {
@@ -48,9 +51,11 @@ void TheWorld::render() {
     ,D2D1::RectF(0,0,width,height));
     // Create text layout rect
 
-    auto text = L"link start";
+    auto textFmt = L"link start    %d";
+    WCHAR buffer[128];
+    wsprintfW(buffer, textFmt, spiderWeb->getPointCount());
     D2D1_SIZE_F textSize = {0.0,0.0};
-    getTextSize(text,textFormat.Get(),textSize);
+    getTextSize(buffer,textFormat.Get(),textSize);
     int x = (size.left + size.right)/2 - textSize.width/2;
     int y = size.top + 10.0;
     D2D1_RECT_F layoutRect = D2D1::RectF(
@@ -59,7 +64,7 @@ void TheWorld::render() {
         static_cast<float>(x + textSize.width),
         static_cast<float>(y + textSize.height)
     );
-    renderTarget->DrawText(text,lstrlenW(text),textFormat.Get(),layoutRect,mainBrush.Get());
+    renderTarget->DrawText(buffer,lstrlenW(buffer),textFormat.Get(),layoutRect,mainBrush.Get());
 
     std::wstring nowTime = nowStr();
     renderTarget->DrawText(nowTime.c_str(),lstrlenW(nowTime.c_str()),
@@ -95,6 +100,11 @@ bool TheWorld::click(const Event & event) {
     return touched(D2D1::Point2F(static_cast<float>(event.x),static_cast<float>(event.y)));
 }
 
+bool TheWorld::move(const Event & event) {
+    move(D2D1::Point2F(static_cast<float>(event.x),static_cast<float>(event.y)));
+    return true;
+}
+
 void TheWorld::tick(float delta) {
     spiderWeb->onTick(delta);
 }
@@ -107,6 +117,14 @@ bool TheWorld::clickProcessor(BaseWorld * data,const Event & event) {
     TheWorld * theWorld = dynamic_cast<TheWorld*>(data);
     if(theWorld != nullptr) {
         return theWorld->click(event);
+    }
+    return false;
+}
+
+bool TheWorld::moveProcessor(BaseWorld * data,const Event & event) {
+    TheWorld * theWorld = dynamic_cast<TheWorld*>(data);
+    if(theWorld != nullptr) {
+        return theWorld->move(event);
     }
     return false;
 }

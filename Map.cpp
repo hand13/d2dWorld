@@ -71,14 +71,20 @@ void Map::onTouch(D2D1_POINT_2F & point) {
 }
 
 
+const float WebPoint::maxSpeed = 300.f;
 
 D2D1_POINT_2F& WebPoint::getPosition() {
     return position;
 }
 
 void WebPoint::move(float delta) {
-    speed.x += force.x * delta;
-    speed.y += force.y * delta;
+    speed.x += (force.x/mess) * delta;
+    speed.y += (force.y/mess) * delta;
+    float spd = std::pow(speed.x * speed.x + speed.y * speed.y, 0.5);
+    if (spd > maxSpeed) {
+        speed.x = (speed.x / spd) * maxSpeed;
+        speed.y = (speed.y / spd) * maxSpeed;
+    }
     position.x += speed.x * delta;
     position.y += speed.y * delta;
 }
@@ -131,7 +137,9 @@ D2D1_POINT_2F SpiderWeb::randomPoint(const D2D1_RECT_F & area) {
 void SpiderWeb::spawnPointInArea(const D2D1_RECT_F & area) {
     auto position = randomPoint(area);
     auto speed = randomPoint(speedArea);
-    WebPoint webPoint(position,speed);
+    std::random_device rd;
+    int mess = std::abs((int)rd() % 300);
+    WebPoint webPoint(position,speed,mess);
     points.push_back(webPoint);
 }
 
@@ -147,24 +155,29 @@ void SpiderWeb::setInWeb(bool inWeb) {
 
 void SpiderWeb::onMove(const D2D1_POINT_2F & point) {
     if(!testPoint(point)) {
+        if(mainIndex >= 0) {
+            points[mainIndex].mess = 1.f;
+        }
         mainIndex = -1;
         inWeb = false;
         return;
     }
     if(!inWeb) {
         WebPoint mp(point);
+        mp.mess = 500.f;
         points.push_back(mp);
         mainIndex = points.size() - 1;
     }
     inWeb = true;
-    if(mainIndex > 0) {
+    if(mainIndex >= 0) {
         points[mainIndex].getPosition().x = point.x;
         points[mainIndex].getPosition().y = point.y;
     }
 }
 
 void SpiderWeb::updateLink() {
-    float forceRate = 0.05f;
+    float forceRate = 10000.f;
+    float antiForceRate = 1000.f;
     for(auto & p : points) {
         p.clearForce();
     }
@@ -173,7 +186,17 @@ void SpiderWeb::updateLink() {
             if(inNear(points[i].getPosition(),points[j].getPosition())) {
                 D2D1_POINT_2F a = points[i].getPosition();
                 D2D1_POINT_2F b = points[j].getPosition();
-                D2D1_POINT_2F aForce = D2D1::Point2F((b.x - a.x )/forceRate,(b.y - a.y)/forceRate);
+                float dx = b.x - a.x;
+                float dy = b.y - a.y;
+                float dis2 = dx * dx + dy * dy;
+                float dis = std::pow(dis2,0.5);
+                float force = 0.f;
+                if(dis < 10.f) {
+                    //force = -(antiForceRate * points[i].mess * points[j].mess)/(dis * dis);
+                }else {
+                    force = (forceRate * points[i].mess * points[j].mess)/dis2;
+                }
+                D2D1_POINT_2F aForce = D2D1::Point2F(force * dx / dis,force * dy / dis);
                 D2D1_POINT_2F bForce = D2D1::Point2F(-aForce.x,-aForce.y);
                 points[i].addForce(aForce);
                 points[j].addForce(bForce);
@@ -196,21 +219,23 @@ void SpiderWeb::onTick(float delta) {
         points[i].move(delta);
     }
 	int k = 0;
-	for (auto m = points.begin(); m != points.end(); m++) {
+	for (auto m = points.begin(); m != points.end();) {
 		if (!testPoint(m->getPosition())) {
-			points.erase(m);
+			m = points.erase(m);
 			if (k < mainIndex) {
 				mainIndex--;
 			}
-		}
-		k++;
+		}else {
+            k++;
+            m++;
+        }
 	}
     updateLink();
 }
 
 void SpiderWeb::draw(ID2D1HwndRenderTarget * renderTarget,ID2D1SolidColorBrush * brush) {
     auto bColor = brush->GetColor();
-    brush->SetColor(D2D1::ColorF(D2D1::ColorF::Green));
+    brush->SetColor(D2D1::ColorF(D2D1::ColorF::Black));
     for(auto & p : points) {
         D2D1_ELLIPSE de;
         de.point = p.getPosition();
@@ -226,4 +251,8 @@ void SpiderWeb::draw(ID2D1HwndRenderTarget * renderTarget,ID2D1SolidColorBrush *
         }
     }
     brush->SetColor(bColor);
+}
+int SpiderWeb::getPointCount() {
+    return points.size();
+
 }

@@ -63,6 +63,11 @@ Event BaseWorld::fromWindowsEvent(UINT msg,WPARAM wParam,LPARAM lParam){
         event.x = LOWORD(lParam);
         event.y = HIWORD(lParam);
         break;
+    case WM_MOUSEMOVE:
+        event.eventType = WE_MOUSE_MOVED;
+        event.x = LOWORD(lParam);
+        event.y = HIWORD(lParam);
+        break;
     default:
         break;
     }

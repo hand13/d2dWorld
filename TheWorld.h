@@ -22,4 +22,6 @@ class TheWorld:public BaseWorld {
     static bool clickProcessor(BaseWorld * data,const Event & event);
     void tick(float delta);
     void move(const D2D1_POINT_2F & point);
+    bool move(const Event & event);
+    static bool moveProcessor(BaseWorld * data,const Event & event);
 };
