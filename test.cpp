@@ -3,7 +3,7 @@
 int main() {
   std::cout<<"start"<<std::endl;
   ConstNode a("a",100);
-  ConstNode b("b",300);
+  ConstNode b("b",350);
   AddNode add("add");
   DisplayNode displayNode("display");
   a.init();
@@ -20,12 +20,6 @@ int main() {
   wiredis.setInputPort(add.getOutputPort("sum"));
   displayNode.addInputPort("resulta",DataType::INT);
   wiredis.setOutputPort(displayNode.getInputPort("resulta"));
-  a.run();
-  b.run();
-  wirea.transport();
-  wireb.transport();
-  add.run();
-  wiredis.transport();
-  displayNode.run();
+  run(&displayNode);
   return 0;
 }

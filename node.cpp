@@ -22,6 +22,13 @@ void Port::setValue(Value * value) {
 Wire * Port::getWire() const{
   return wire;
 }
+void Port::setWire(Wire * wire) {
+  this->wire = wire;
+}
+
+Node * Port::getNode() {
+  return node;
+}
 Port::~Port(){}
 
 Node::Node(const std::string & name) :name(name){
@@ -77,9 +84,11 @@ Wire::Wire() {
 }
 void Wire::setInputPort(Port * port) {
   inputPort = port;
+  port->setWire(this);
 }
 void Wire::setOutputPort(Port * port) {
   outputPort= port;
+  port->setWire(this);
 }
 
 Port * Wire::getInputPort()const {
@@ -148,4 +157,15 @@ void DisplayNode::run() {
     std::cout<<p.second->toString();
     std::cout<<std::endl;
   }
+}
+void run(Node * node) {
+  for(auto & f : node->enumInputPorts()) {
+    Port * port = f.second;
+    if(port != nullptr && port->getWire() != nullptr && port->getWire()->getInputPort() != nullptr) {
+      Port * in = port->getWire()->getInputPort();
+      run(in->getNode());
+      port->getWire()->transport();
+    }
+  }
+  node->run();
 }

@@ -36,6 +36,8 @@ class Port {
     virtual Value * getValue() const;
     virtual void setValue(Value * value);
     Wire * getWire()const;
+    void setWire(Wire * wire);
+    Node * getNode();
     virtual ~Port();
 };
 
@@ -105,3 +107,4 @@ class DisplayNode:public Node {
     DisplayNode(const std::string & name);
     virtual void run();
 };
+void run(Node * node);
