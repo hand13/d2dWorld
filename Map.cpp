@@ -18,14 +18,14 @@ void Pawn::draw(ID2D1HwndRenderTarget * renderTarget,ID2D1SolidColorBrush * brus
     }
     brush->SetColor(backupColor);
 }
-bool Pawn::touched(D2D1_POINT_2F & point) {
+bool Pawn::touched(const D2D1_POINT_2F & point) {
     if(point.x > rect.left && point.x < rect.right && point.y > rect.top && point.y < rect.bottom) {
         onTouch(point);
         return true;
     }
     return false;
 }
-void Pawn::onTouch(D2D1_POINT_2F & point) {
+void Pawn::onTouch(const D2D1_POINT_2F & point) {
     if(pawnType == EMPTY) {
         pawnType = RED;
     }else if(pawnType == RED) {
@@ -58,7 +58,7 @@ void Map::draw(ID2D1HwndRenderTarget * renderTarget,ID2D1SolidColorBrush * brush
         pawn.draw(renderTarget,brush);
     }
 }
-bool Map::touched(D2D1_POINT_2F& point) {
+bool Map::touched(const D2D1_POINT_2F& point) {
     for(Pawn&pawn:pawns) {
         if(pawn.touched(point)) {
             onTouch(point);
@@ -67,7 +67,7 @@ bool Map::touched(D2D1_POINT_2F& point) {
     }
     return false;
 }
-void Map::onTouch(D2D1_POINT_2F & point) {
+void Map::onTouch(const D2D1_POINT_2F & point) {
 }
 
 

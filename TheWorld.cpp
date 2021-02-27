@@ -89,7 +89,7 @@ HRESULT TheWorld::getTextSize(const WCHAR * text,IDWriteTextFormat * pTextFormat
     }
     return hr;
 }
-bool TheWorld::touched(D2D1_POINT_2F & point) {
+bool TheWorld::touched(const D2D1_POINT_2F & point) {
     if (worldMap->touched(point)) {
         // render();
     }

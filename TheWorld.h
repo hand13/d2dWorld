@@ -17,7 +17,7 @@ class TheWorld:public BaseWorld {
     virtual bool initResource();
     virtual void render();
     virtual bool resize();
-    bool touched(D2D1_POINT_2F & point);
+    bool touched(const D2D1_POINT_2F & point);
     bool click(const Event& event);
     static bool clickProcessor(BaseWorld * data,const Event & event);
     void tick(float delta);
