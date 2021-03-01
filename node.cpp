@@ -157,7 +157,7 @@ void Wire::transport() {
   if(inputPort != nullptr && outputPort != nullptr) {
     if(outputPort->getValue() != nullptr && inputPort->getValue() != nullptr) {
       auto  a = outputPort->getValue();
-      auto b = outputPort->getValue();
+      auto b = inputPort->getValue();
       if(a->getDataType() != b->getDataType()){
         std::cout<<"type is different"<<std::endl;
       }else {
@@ -252,5 +252,19 @@ void run(Node * node) {
     }
   }
   node->run();
+}
+Int2FloatNode::Int2FloatNode(const std::string& name):Node(name) {}
+void Int2FloatNode::init() {
+    addInputPort("input", DataType::INT);
+    addOutputPort("output", DataType::FLOAT);
+}
+void Int2FloatNode::run() {
+  IntValue* in =dynamic_cast<IntValue*> (getInputPort("input")->getValue());
+  FloatValue* out=dynamic_cast<FloatValue*> (getOutputPort("output")->getValue());
+  if (in != nullptr && out != nullptr) {
+      int i = *(int*)in->getValue();
+      float o = static_cast<float>(i);
+      out->setValue(&o);
+  }
 }
 Value::~Value(){}

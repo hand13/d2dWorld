@@ -125,4 +125,10 @@ class SinNode:public Node {
     virtual void init();
     virtual void run();
 };
+class Int2FloatNode :public Node {
+public:
+    Int2FloatNode(const std::string& name);
+    virtual void init();
+    virtual void run();
+};
 void run(Node * node);
