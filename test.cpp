@@ -19,6 +19,7 @@ int main() {
   Wire wiredis;
   wiredis.setInputPort(add.getOutputPort("sum"));
   displayNode.addInputPort("resulta",DataType::INT);
+  displayNode.setValue("resulta", new IntValue(0));
   wiredis.setOutputPort(displayNode.getInputPort("resulta"));
   run(&displayNode);
   return 0;

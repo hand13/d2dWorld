@@ -22,6 +22,7 @@ class Value {
     virtual void * getValue()= 0;
     virtual std::string toString()const = 0;
     virtual void setValue(void * value) = 0;
+    virtual ~Value();
 };
 
 class Port {
@@ -33,12 +34,12 @@ class Port {
     DataType dataType;
   public:
     Port(const std::string & name,bool isInput,Node * node,DataType dataType);
-    virtual Value * getValue() const;
-    virtual void setValue(Value * value);
+    Value * getValue() const;
+    void setValue(Value * value);
     Wire * getWire()const;
     void setWire(Wire * wire);
     Node * getNode();
-    virtual ~Port();
+    ~Port();
 };
 
 class Node {

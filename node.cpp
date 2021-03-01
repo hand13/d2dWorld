@@ -29,10 +29,19 @@ void Port::setWire(Wire * wire) {
 Node * Port::getNode() {
   return node;
 }
-Port::~Port(){}
+Port::~Port(){
+  if(wire != nullptr) {
+    if(isInput) {
+      wire->setInputPort(nullptr);
+    }else {
+      wire->setOutputPort(nullptr);
+    }
+  }
+}
 
 Node::Node(const std::string & name) :name(name){
 }
+
 void Node::init() {
   //init
 }
@@ -50,9 +59,15 @@ void Node::addOutputPort(const std::string & portName,DataType dataType) {
 }
 
 Port* Node::getInputPort(const std::string & portName) const{
+  if(inputPorts.count(portName)<= 0){
+    return nullptr;
+  }
   return inputPorts.at(portName);
 }
 Port* Node::getOutputPort(const std::string & portName) const{
+  if(outputPorts.count(portName) <= 0) {
+    return nullptr;
+  }
   return outputPorts.at(portName);
 }
 
@@ -70,13 +85,32 @@ std::map<std::string,Port*> Node::enumOutputPorts() {
   return outputPorts;
 }
 Value * Node::getValue(const std::string & name)const {
+  if(values.count(name) <= 0) {
+    return nullptr;
+  }
   return values.at(name);
 }
 void Node::setValue(const std::string & name,Value * value){
   values[name] = value;
 
 }
-Node::~Node(){
+
+Node::~Node() {
+  for(auto & port:inputPorts) {
+    if(port.second != nullptr) {
+      delete port.second;
+    }
+  }
+  for(auto & port:outputPorts) {
+    if(port.second != nullptr) {
+      delete port.second;
+    }
+  }
+  for(auto & v : values) {
+    if(v.second != nullptr) {
+      delete v.second;
+    }
+  }
 }
 Wire::Wire() {
   inputPort = nullptr;
@@ -84,11 +118,15 @@ Wire::Wire() {
 }
 void Wire::setInputPort(Port * port) {
   inputPort = port;
-  port->setWire(this);
+  if(port != nullptr) {
+    port->setWire(this);
+  }
 }
 void Wire::setOutputPort(Port * port) {
   outputPort= port;
-  port->setWire(this);
+  if(port != nullptr) {
+    port->setWire(this);
+  }
 }
 
 Port * Wire::getInputPort()const {
@@ -99,7 +137,9 @@ Port * Wire::getOutputPort()const {
 }
 void Wire::transport() {
   if(inputPort != nullptr && outputPort != nullptr) {
-    outputPort->setValue(inputPort->getValue());
+    if(outputPort->getValue() != nullptr && inputPort->getValue() != nullptr) {
+      outputPort->getValue()->setValue(inputPort->getValue()->getValue());
+    }
   }
 }
 
@@ -169,3 +209,4 @@ void run(Node * node) {
   }
   node->run();
 }
+Value::~Value(){}
