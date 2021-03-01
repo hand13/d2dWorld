@@ -18,7 +18,7 @@ class Value {
     DataType dataType;
   public:
     Value(DataType dataType);
-    DataType getDataType()const;
+    virtual DataType getDataType()const;
     virtual void * getValue()= 0;
     virtual std::string toString()const = 0;
     virtual void setValue(void * value) = 0;
@@ -52,6 +52,7 @@ class Node {
     Node(const std::string & name);
     virtual void init();
     virtual void run();
+    void addValue(const std::string& name,DataType dataType);
     void addInputPort(const std::string& portName,DataType dataType);
     void addOutputPort(const std::string& portName,DataType dataType);
     Port* getInputPort(const std::string& portName)const;
@@ -87,6 +88,16 @@ class IntValue:public Value {
     virtual std::string toString()const;
 };
 
+class FloatValue:public Value {
+  private:
+    float value;
+  public:
+    FloatValue(float value):Value(DataType::FLOAT),value(value){}
+    virtual void * getValue();
+    virtual void setValue(void * value);
+    virtual std::string toString()const;
+};
+
 class ConstNode:public Node {
   private:
     int value;
@@ -106,6 +117,12 @@ class AddNode :public Node {
 class DisplayNode:public Node {
   public:
     DisplayNode(const std::string & name);
+    virtual void run();
+};
+class SinNode:public Node {
+  public:
+    SinNode(const std::string & name);
+    virtual void init();
     virtual void run();
 };
 void run(Node * node);

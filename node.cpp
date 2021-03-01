@@ -1,5 +1,6 @@
 #include "node.h"
 #include <iostream>
+#include <cmath>
 Value::Value(DataType dataType):dataType(dataType){}
 DataType Value::getDataType() const {
   return dataType;
@@ -52,10 +53,27 @@ void Node::run() {
 void Node::addInputPort(const std::string & portName,DataType dataType) {
   Port * input = new Port(portName,true,this,dataType);
   inputPorts[portName] = input;
+  addValue(portName,dataType);
 }
 void Node::addOutputPort(const std::string & portName,DataType dataType) {
   Port * output = new Port(portName,false,this,dataType);
   outputPorts[portName] = output;
+  addValue(portName,dataType);
+}
+
+void Node::addValue(const std::string & name,DataType dataType) {
+  Value * value = nullptr;
+  switch(dataType) {
+    case DataType::INT:
+      value = new IntValue(0);
+      break;
+    case DataType::FLOAT:
+      value = new FloatValue(0.f);
+      break;
+    default:
+      break;
+  }
+  setValue(name,value);
 }
 
 Port* Node::getInputPort(const std::string & portName) const{
@@ -138,7 +156,13 @@ Port * Wire::getOutputPort()const {
 void Wire::transport() {
   if(inputPort != nullptr && outputPort != nullptr) {
     if(outputPort->getValue() != nullptr && inputPort->getValue() != nullptr) {
-      outputPort->getValue()->setValue(inputPort->getValue()->getValue());
+      auto  a = outputPort->getValue();
+      auto b = outputPort->getValue();
+      if(a->getDataType() != b->getDataType()){
+        std::cout<<"type is different"<<std::endl;
+      }else {
+        a->setValue(b->getValue());
+      }
     }
   }
 }
@@ -148,10 +172,7 @@ AddNode::AddNode(const std::string & name) :Node(name){
 void AddNode::init() {
   addInputPort("a",DataType::INT);
   addInputPort("b",DataType::INT);
-  setValue("a",new IntValue(0));
-  setValue("b",new IntValue(0));
   addOutputPort("sum",DataType::INT);
-  setValue("sum",new IntValue(0));
 }
 void AddNode::run() {
   IntValue * av = dynamic_cast<IntValue*>(getInputPort("a")->getValue());
@@ -174,12 +195,21 @@ void  IntValue::setValue(void * value) {
 std::string IntValue::toString() const {
   return std::to_string(value);
 }
+
+void *  FloatValue::getValue() {
+  return &value;
+}
+void FloatValue::setValue(void * value) {
+  this->value = *(float *)value;
+}
+std::string FloatValue::toString()const {
+  return std::to_string(value);
+}
 ConstNode::ConstNode(const std::string & name,int value) :Node(name){
   this->value = value;
 }
 void ConstNode::init() {
   addOutputPort("value",DataType::INT);
-  setValue("value",new IntValue(this->value));
 }
 void ConstNode::setIntValue(int value) {
   this->value = value;
@@ -196,6 +226,20 @@ void DisplayNode::run() {
     std::cout<<p.first<<":";
     std::cout<<p.second->toString();
     std::cout<<std::endl;
+  }
+}
+SinNode::SinNode(const std::string & name):Node(name){}
+void SinNode::init() {
+  addInputPort("input",DataType::FLOAT);
+  addOutputPort("output",DataType::FLOAT);
+}
+void SinNode::run() {
+  FloatValue* in =dynamic_cast<FloatValue*> (getInputPort("input")->getValue());
+  FloatValue* out=dynamic_cast<FloatValue*> (getOutputPort("output")->getValue());
+  if(in != nullptr && out != nullptr) {
+    float i = *(float*)in->getValue();
+    float o = std::sin(i);
+    out->setValue(&o);
   }
 }
 void run(Node * node) {
