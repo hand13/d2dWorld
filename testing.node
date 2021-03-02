@@ -1,0 +1,14 @@
+4
+const aNode
+const bNode
+add addNode
+display displayNode
+3
+wirea
+wireb
+wireadd
+3
+aNode value wirea addNode a
+bNode value wireb addNode b
+addNode sum wireadd displayNode pok
+displayNode

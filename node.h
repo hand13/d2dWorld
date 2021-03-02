@@ -118,6 +118,7 @@ class DisplayNode:public Node {
   public:
     DisplayNode(const std::string & name);
     virtual void run();
+    virtual void init();
 };
 class SinNode:public Node {
   public:

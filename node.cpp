@@ -220,6 +220,10 @@ void ConstNode::run(){
 
 DisplayNode::DisplayNode(const std::string & name):Node(name){}
 
+void DisplayNode::init() {
+  addInputPort("pok",DataType::INT);//todo
+}
+
 void DisplayNode::run() {
   std::cout<<"display value"<<std::endl;
   for(auto & p : values) {
